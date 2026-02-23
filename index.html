@@ -1,1 +1,844 @@
-<html><body>OK</body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Transporte Nacional | COLUN</title>
+  <meta name="description" content="Transporte Nacional COLUN: coordinación, control y seguimiento de despachos a centros a lo largo de Chile." />
+
+  <!-- Leaflet (mapa) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <style>
+    :root{
+      --bg:#f4f7ff;
+      --card:#ffffff;
+      --muted:#4b5b7a;
+      --text:#0f234a;
+      --brand:#1aa36f;   /* verde */
+      --brand2:#1b5fd6;  /* azul */
+      --border: rgba(15,35,74,.12);
+      --shadow: 0 18px 50px rgba(15,35,74,.12);
+      --radius: 18px;
+      --danger:#d81f2a;  /* rojo logo */
+      --ok:#0a7b4f;
+      --warn:#b45a00;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(1200px 800px at 15% 10%, rgba(26,163,111,.10), transparent 55%),
+        radial-gradient(900px 700px at 85% 20%, rgba(27,95,214,.10), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.45;
+    }
+    a{color:inherit}
+    .container{max-width:1120px;margin:0 auto;padding:0 18px}
+
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background: rgba(244,247,255,.78);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 0;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      font-weight:900;
+      letter-spacing:.2px;
+      min-width: 260px;
+    }
+    .brand .title{
+      display:flex; flex-direction:column; line-height:1.05;
+    }
+    .brand .title strong{font-size:14px}
+    .brand .title span{font-size:12px;color:var(--muted);font-weight:800}
+    .logo-img{
+      width:70px; height:auto;
+      display:block;
+      filter: drop-shadow(0 10px 18px rgba(15,35,74,.12));
+    }
+
+    .navlinks{
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
+      font-size:14px; color:var(--muted);
+    }
+    .navlinks a{
+      text-decoration:none; padding:8px 10px; border-radius:12px;
+      border:1px solid transparent;
+      white-space:nowrap;
+    }
+    .navlinks a:hover{
+      color:var(--text);
+      border-color: var(--border);
+      background: rgba(255,255,255,.65);
+    }
+
+    .hero{padding:30px 0 18px}
+    .hero-grid{
+      display:grid; grid-template-columns: 1.2fr .8fr; gap:18px;
+      align-items:stretch;
+    }
+    @media (max-width: 900px){
+      .hero-grid{grid-template-columns:1fr}
+      .brand{min-width:unset}
+      .logo-img{width:64px}
+    }
+
+    .card{
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-main{
+      padding:26px;
+      position: relative;
+      overflow: hidden;
+      background: none;
+    }
+    .hero-main::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        linear-gradient(90deg, rgba(244,247,255,.93) 0%, rgba(244,247,255,.72) 45%, rgba(244,247,255,.22) 100%),
+        url("slider01.jpg") center/cover no-repeat;
+      transform: scale(1.02);
+      z-index:0;
+    }
+    .hero-main::after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(900px 500px at 20% 20%, rgba(26,163,111,.12), transparent 60%),
+        radial-gradient(900px 500px at 80% 35%, rgba(216,31,42,.08), transparent 60%);
+      z-index:0;
+    }
+    .hero-main > *{ position: relative; z-index: 1; }
+
+    .eyebrow{
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:12px; color:var(--muted);
+      border:1px solid var(--border);
+      padding:6px 10px; border-radius:999px;
+      background: rgba(255,255,255,.70);
+      flex-wrap:wrap;
+    }
+    .dot{width:8px;height:8px;border-radius:99px;background:var(--brand)}
+    .dot.red{background:var(--danger)}
+    h1{margin:14px 0 10px; font-size:38px; line-height:1.05}
+    @media (max-width: 900px){h1{font-size:34px}}
+    .sub{color:var(--muted); font-size:15px; max-width:78ch}
+
+    .cta{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap;}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:10px 14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      text-decoration:none;
+      font-weight:800;
+      font-size:14px;
+      background: rgba(255,255,255,.78);
+      cursor:pointer;
+    }
+    .btn.primary{
+      border-color: rgba(26,163,111,.35);
+      background: linear-gradient(135deg, rgba(26,163,111,.16), rgba(27,95,214,.10));
+    }
+    .btn.red{
+      border-color: rgba(216,31,42,.25);
+      background: linear-gradient(135deg, rgba(216,31,42,.10), rgba(255,255,255,.70));
+    }
+    .btn:hover{filter:brightness(1.03)}
+
+    .hero-side{padding:18px}
+    .kpis{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .kpi{
+      padding:14px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background: rgba(244,247,255,.78);
+    }
+    .kpi .n{font-size:14px;font-weight:950}
+    .kpi .l{color:var(--muted);font-size:12px;margin-top:4px}
+
+    section{padding:22px 0}
+    .section-title{
+      font-size:18px; margin:0 0 12px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .pill{
+      font-size:12px; color:var(--muted);
+      border:1px solid var(--border);
+      padding:4px 10px; border-radius:999px;
+      background: rgba(255,255,255,.78);
+    }
+    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+    @media (max-width: 900px){.grid-3{grid-template-columns:1fr}}
+    .item{padding:16px}
+    .item h3{margin:0 0 6px; font-size:15px}
+    .item p{margin:0; color:var(--muted); font-size:14px}
+
+    .bullets{
+      margin:10px 0 0;
+      padding-left:18px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .bullets li{margin:6px 0}
+
+    .map-wrap{padding:16px}
+    #map{
+      width:100%;
+      height: 420px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow:hidden;
+    }
+    .map-tools{
+      display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 0;
+      align-items:center; justify-content:space-between;
+    }
+    .search{flex:1; min-width:220px; display:flex; gap:10px; align-items:center;}
+
+    input[type="search"], input[type="text"], input[type="email"], textarea, select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.95);
+      color: var(--text);
+      outline:none;
+      font: inherit;
+    }
+    textarea{min-height:110px; resize: vertical;}
+    input::placeholder, textarea::placeholder{color: rgba(75,91,122,.75)}
+
+    .list{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width:900px){.list{grid-template-columns:1fr}}
+    .center{
+      padding:12px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.92);
+      cursor:pointer;
+    }
+    .center:hover{background: rgba(244,247,255,.97)}
+    .center .name{font-weight:950}
+    .center .meta{color:var(--muted); font-size:13px; margin-top:4px}
+
+    .contact-grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+    }
+    @media (max-width: 900px){.contact-grid{grid-template-columns:1fr}}
+
+    .contact-list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:10px;
+    }
+    .contact-card{
+      padding:12px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.92);
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .contact-card .who{display:flex; flex-direction:column; gap:2px;}
+    .contact-card .who strong{font-weight:950}
+    .contact-card .who span{color:var(--muted); font-size:12px}
+    .contact-card a{
+      font-weight:850;
+      text-decoration:none;
+      border:1px solid var(--border);
+      padding:8px 10px;
+      border-radius:12px;
+      background: rgba(244,247,255,.75);
+    }
+    .contact-card a:hover{filter:brightness(1.02)}
+
+    .form-row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media (max-width: 900px){.form-row{grid-template-columns:1fr}}
+
+    .hint{color:var(--muted); font-size:12px; margin-top:8px}
+    .status{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(244,247,255,.85);
+      display:none;
+      font-weight:800;
+      font-size:13px;
+    }
+    .status.ok{
+      display:block;
+      border-color: rgba(10,123,79,.25);
+      background: rgba(10,123,79,.08);
+      color: var(--ok);
+    }
+    .status.err{
+      display:block;
+      border-color: rgba(216,31,42,.25);
+      background: rgba(216,31,42,.08);
+      color: var(--danger);
+    }
+
+    footer{
+      padding:26px 0 40px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 14px;
+    }
+    .footgrid{ display:grid; grid-template-columns: 1.2fr .8fr; gap:14px; }
+    @media (max-width:900px){.footgrid{grid-template-columns:1fr}}
+    .small{font-size:13px}
+    .tag{
+      display:inline-flex; gap:8px; align-items:center;
+      border:1px solid var(--border);
+      padding:7px 10px; border-radius:999px;
+      background: rgba(255,255,255,.78);
+      margin-top:10px;
+    }
+
+    .leaflet-popup-content{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <div class="nav">
+        <div class="brand">
+          <img class="logo-img" src="colun-logo.png" alt="COLUN" />
+          <div class="title">
+            <strong>Transporte Nacional</strong>
+            <span>Presentación para transportistas y aliados</span>
+          </div>
+        </div>
+
+        <nav class="navlinks">
+          <a href="#que-hacemos">Qué hacemos</a>
+          <a href="#cargas">Tipos de carga</a>
+          <a href="#mision">Misión y visión</a>
+          <a href="#centros">Centros</a>
+          <a href="#proceso">Cómo trabajamos</a>
+          <a href="#contacto">Contacto</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="hero">
+      <div class="hero-grid">
+        <div class="card hero-main">
+          <div class="eyebrow">
+            <span class="dot"></span> Coordinación · Control · Seguimiento
+            <span style="width:1px;height:14px;background:var(--border);display:inline-block;margin:0 6px"></span>
+            <span class="dot red"></span> Toda la magia del sur
+          </div>
+
+          <h1>Conectamos la operación logística con el transporte a nivel nacional.</h1>
+          <p class="sub">
+            Somos el equipo de Transporte Nacional. Coordinamos despachos, apoyamos la operación en ruta
+            y trabajamos con centros de destino y transportistas para asegurar un servicio confiable y seguro.
+          </p>
+
+          <div class="cta">
+            <a class="btn primary" href="#centros">Ver centros de destino</a>
+            <a class="btn" href="#cargas">Ver tipos de carga</a>
+            <a class="btn red" href="#contacto">Contactar</a>
+          </div>
+
+          <p class="sub" style="margin-top:14px;font-size:13px">
+            *Página informativa para transportistas y aliados. Contenidos pueden ajustarse según lineamientos internos.
+          </p>
+        </div>
+
+        <div class="card hero-side">
+          <div class="kpis">
+            <div class="kpi">
+              <div class="n">Cobertura nacional</div>
+              <div class="l">Centros en múltiples regiones</div>
+            </div>
+            <div class="kpi">
+              <div class="n">Frío y seco</div>
+              <div class="l">Refrigerado / No refrigerado</div>
+            </div>
+            <div class="kpi">
+              <div class="n">Modalidades</div>
+              <div class="l">Piso / Doble piso</div>
+            </div>
+            <div class="kpi">
+              <div class="n">Seguridad</div>
+              <div class="l">Buenas prácticas y cumplimiento</div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px; padding:14px; border-radius:16px; border:1px solid var(--border); background:rgba(255,255,255,.88)">
+            <div style="font-weight:950">¿Para qué sirve esta página?</div>
+            <div style="color:var(--muted); font-size:13px; margin-top:6px">
+              Para que cualquier transportista tenga una visión rápida de nuestro rol,
+              el alcance nacional y los tipos de carga/equipos con los que trabajamos.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section id="que-hacemos">
+      <h2 class="section-title">Qué hacemos <span class="pill">Resumen operativo</span></h2>
+      <div class="grid-3">
+        <div class="card item">
+          <h3>Planificación y coordinación</h3>
+          <p>Programación de despachos, ventanas, prioridades y coordinación con centros de destino.</p>
+        </div>
+        <div class="card item">
+          <h3>Control y seguimiento</h3>
+          <p>Monitoreo de viajes, comunicación ante contingencias y soporte operativo.</p>
+        </div>
+        <div class="card item">
+          <h3>Mejora continua</h3>
+          <p>Levantamos oportunidades con centros y transportistas para mejorar tiempos y servicio.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="cargas">
+      <h2 class="section-title">Tipos de carga y equipos <span class="pill">Cómo operamos</span></h2>
+
+      <div class="grid-3">
+        <div class="card item">
+          <h3>Cargas</h3>
+          <p>Trabajamos con diferentes necesidades operacionales según el producto.</p>
+          <ul class="bullets">
+            <li><strong>Carga seca</strong> (no refrigerada)</li>
+            <li><strong>Carga refrigerada</strong> (cadena de frío)</li>
+          </ul>
+        </div>
+
+        <div class="card item">
+          <h3>Tipos de camión</h3>
+          <p>Equipos utilizados según destino y requerimientos.</p>
+          <ul class="bullets">
+            <li><strong>Rampla cerrada</strong></li>
+            <li><strong>Rampla cortina</strong></li>
+            <li><strong>Furgón</strong></li>
+          </ul>
+        </div>
+
+        <div class="card item">
+          <h3>Modalidad de carga</h3>
+          <p>Según tipo de carga, destino y capacidad.</p>
+          <ul class="bullets">
+            <li><strong>Carga a piso</strong></li>
+            <li><strong>Doble piso</strong> (foco en <strong>Kinedyne</strong>)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-top:14px">
+        <div class="card item" style="grid-column: span 2">
+          <h3>Estándares y métodos (histórico y evolución)</h3>
+          <p>
+            Actualmente damos foco a la modalidad <strong>Kinedyne</strong> para doble piso. Históricamente también
+            se han utilizado métodos como <strong>tablas</strong>, <strong>roller</strong> y <strong>maxiloda</strong>
+            según disponibilidad y necesidad operacional.
+          </p>
+        </div>
+        <div class="card item">
+          <h3>Objetivo</h3>
+          <p>
+            Mantener una operación <strong>segura</strong>, <strong>eficiente</strong> y <strong>estandarizada</strong>,
+            cuidando la carga y el cumplimiento.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="mision">
+      <h2 class="section-title">Misión y visión <span class="pill">Identidad del equipo</span></h2>
+      <div class="grid-3">
+        <div class="card item" style="grid-column: span 2">
+          <h3>Misión</h3>
+          <p>
+            Asegurar una operación de transporte nacional confiable, segura y eficiente, coordinando
+            actores internos y externos para cumplir los compromisos de servicio.
+          </p>
+        </div>
+        <div class="card item">
+          <h3>Visión</h3>
+          <p>
+            Ser un referente en gestión de transporte, con altos estándares de control, mejora continua
+            y colaboración con transportistas y centros.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="centros">
+      <h2 class="section-title">Centros de destino <span class="pill">Mapa + listado</span></h2>
+
+      <div class="card map-wrap">
+        <div id="map" aria-label="Mapa de centros en Chile"></div>
+
+        <div class="map-tools">
+          <div class="search">
+            <input id="q" type="search" placeholder="Buscar centro (ej: Coquimbo, Belloto, Antofagasta)..." />
+          </div>
+          <div style="color:var(--muted); font-size:13px">
+            Centros mostrados: <span id="count">0</span>
+          </div>
+        </div>
+
+        <div id="list" class="list"></div>
+      </div>
+
+      <p class="sub" style="margin-top:10px">
+        Consejo: esta sección es ideal para enviar a transportistas (ven cobertura nacional en segundos).
+      </p>
+    </section>
+
+    <section id="proceso">
+      <h2 class="section-title">Cómo trabajamos <span class="pill">Flujo simple</span></h2>
+      <div class="grid-3">
+        <div class="card item">
+          <h3>1) Programación</h3>
+          <p>Definimos ventanas, requisitos, prioridades y coordinación por destino.</p>
+        </div>
+        <div class="card item">
+          <h3>2) Ejecución y seguimiento</h3>
+          <p>Control del avance, comunicación por desvíos/demoras y apoyo operativo.</p>
+        </div>
+        <div class="card item">
+          <h3>3) Cierre y mejora</h3>
+          <p>Revisión de incidentes, feedback y acciones para mejorar experiencia y servicio.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contacto">
+      <h2 class="section-title">Contacto <span class="pill">Correos + formulario</span></h2>
+
+      <div class="contact-grid">
+        <!-- FORMULARIO -->
+        <div class="card item">
+          <h3>Formulario</h3>
+          <p style="color:var(--muted); font-size:14px; margin-top:0">
+            Completa el formulario y te contactaremos. (Enviado vía Formspree)
+          </p>
+
+          <form id="contactForm" method="POST" action="https://formspree.io/f/xnjbogbk">
+            <div class="form-row">
+              <div>
+                <label for="nombre" style="font-weight:850;font-size:13px">Nombre</label>
+                <input id="nombre" name="nombre" type="text" placeholder="Ej: Juan Pérez" required />
+              </div>
+              <div>
+                <label for="empresa" style="font-weight:850;font-size:13px">Empresa / Transportista</label>
+                <input id="empresa" name="empresa" type="text" placeholder="Ej: Transportes X" />
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-top:10px">
+              <div>
+                <label for="email" style="font-weight:850;font-size:13px">Correo</label>
+                <input id="email" name="email" type="email" placeholder="correo@ejemplo.cl" required />
+              </div>
+              <div>
+                <label for="telefono" style="font-weight:850;font-size:13px">Teléfono</label>
+                <input id="telefono" name="telefono" type="text" placeholder="+56 9 xxxx xxxx" />
+              </div>
+            </div>
+
+            <div style="margin-top:10px">
+              <label for="motivo" style="font-weight:850;font-size:13px">Motivo</label>
+              <select id="motivo" name="motivo">
+                <option value="Coordinación / Consultas">Coordinación / Consultas</option>
+                <option value="Disponibilidad de equipos">Disponibilidad de equipos</option>
+                <option value="Incidencia / Seguimiento">Incidencia / Seguimiento</option>
+                <option value="Otros">Otros</option>
+              </select>
+            </div>
+
+            <div style="margin-top:10px">
+              <label for="mensaje" style="font-weight:850;font-size:13px">Mensaje</label>
+              <textarea id="mensaje" name="mensaje" placeholder="Escribe aquí tu consulta..." required></textarea>
+            </div>
+
+            <input type="hidden" name="destinatarios" value="christian.soto@colun.cl; luismartinezm@colun.cl; bastian.toro@colun.cl; veronica.alvarez@colun.cl; robert.cardenas@colun.cl; hsalamanca@colun.cl; alexander.amigo@externoscolun.cl" />
+
+            <div class="cta" style="margin-top:12px">
+              <button class="btn primary" type="submit">Enviar formulario</button>
+              <button class="btn" type="button" onclick="openMailDraft()">Enviar por correo (backup)</button>
+              <a class="btn red" target="_blank" rel="noopener"
+                 href="https://wa.me/56941346703?text=Hola%20Alexander,%20te%20escribo%20por%20Transporte%20Nacional%20COLUN.%20%C2%BFPodemos%20coordinar%3F">
+                WhatsApp
+              </a>
+            </div>
+
+            <div id="formStatus" class="status"></div>
+
+            <div class="hint">
+              Si Formspree te pide verificación, revisa tu correo y confirma el formulario.
+            </div>
+          </form>
+        </div>
+
+        <!-- CONTACTOS -->
+        <div class="card item">
+          <h3>Correos de contacto</h3>
+          <p style="color:var(--muted); font-size:14px; margin-top:0">
+            Puedes escribir directamente a cualquiera de estos contactos.
+          </p>
+
+          <div class="contact-list">
+            <div class="contact-card">
+              <div class="who"><strong>Christian Soto</strong><span>Jefe</span></div>
+              <a href="mailto:christian.soto@colun.cl?subject=Contacto%20Transporte%20Nacional%20COLUN">Escribir</a>
+            </div>
+
+            <div class="contact-card">
+              <div class="who"><strong>Luis Martinez</strong><span>Supervisor Transporte</span></div>
+              <a href="mailto:luismartinezm@colun.cl?subject=Contacto%20Transporte%20Nacional%20COLUN">Escribir</a>
+            </div>
+
+            <div class="contact-card">
+              <div class="who"><strong>Bastian Toro</strong><span>Ingeniero Transporte</span></div>
+              <a href="mailto:Bastian.toro@colun.cl?subject=Contacto%20Transporte%20Nacional%20COLUN">Escribir</a>
+            </div>
+
+            <div class="contact-card">
+              <div class="who"><strong>Verónica Alvarez</strong><span>Administrativa</span></div>
+              <a href="mailto:Veronica.alvarez@colun.cl?subject=Contacto%20Transporte%20Nacional%20COLUN">Escribir</a>
+            </div>
+
+            <div class="contact-card">
+              <div class="who"><strong>Robert Cárdenas</strong><span>Administrativo</span></div>
+              <a href="mailto:robert.cardenas@colun.cl?subject=Contacto%20Transporte%20Nacional%20COLUN">Escribir</a>
+            </div>
+
+            <div class="contact-card">
+              <div class="who"><strong>Hector Salamanca</strong><span>Coordinador T. Nacional</span></div>
+              <a href="mailto:Hsalamanca@colun.cl?subject=Contacto%20Transporte%20Nacional%20COLUN">Escribir</a>
+            </div>
+
+            <div class="contact-card">
+              <div class="who"><strong>Alexander Amigo</strong><span>Coordinador T. Nacional</span></div>
+              <a href="mailto:alexander.amigo@externoscolun.cl?subject=Contacto%20Transporte%20Nacional%20COLUN">Escribir</a>
+            </div>
+          </div>
+
+          <div class="cta" style="margin-top:12px">
+            <a class="btn" href="mailto:alexander.amigo@externoscolun.cl?subject=Contacto%20Transporte%20Nacional%20COLUN&body=Hola%20Alexander,%0D%0A%0D%0AMe%20gustar%C3%ADa%20coordinar%20lo%20siguiente:%0D%0A-%20%0D%0A%0D%0AGracias.">Escribir a Alexander</a>
+            <a class="btn red" href="#centros">Volver al mapa</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footgrid">
+        <div>
+          <div style="font-weight:950;color:var(--text)">Transporte Nacional | COLUN</div>
+          <div class="small" style="margin-top:8px">
+            Página informativa para transportistas y aliados. Contenido ajustable según lineamientos internos.
+          </div>
+          <div class="tag"><span class="dot"></span> Coordinación &nbsp; <span class="dot red"></span> Compromiso</div>
+        </div>
+        <div class="small">
+          <div style="font-weight:950;color:var(--text)">Actualización</div>
+          <div style="margin-top:8px">Centros: lista “centers”.</div>
+          <div>Mapa: marcadores automáticos con lat/lon.</div>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // Centros (según Excel)
+    const centers = [
+      { name: "CD Antofagasta",   city: "Antofagasta",   region: "Antofagasta", lat: -23.512620, lon: -70.399890, type: "Centro Distribución" },
+      { name: "CD Belloto",       city: "Quilpué",       region: "Valparaíso",  lat: -33.040030, lon: -71.417590, type: "Centro Distribución" },
+      { name: "CD Bio Bio",       city: "Chillán Viejo", region: "Ñuble",       lat: -36.681871, lon: -72.251181, type: "Centro Distribución" },
+      { name: "CD Coquimbo",      city: "Coquimbo",      region: "Coquimbo",    lat: -29.973942, lon: -71.270996, type: "Centro Distribución" },
+      { name: "CD Coyhaique",     city: "Coyhaique",     region: "Aysén",       lat: -45.575696, lon: -72.045526, type: "Centro Distribución" },
+      { name: "CD Iquique",       city: "Iquique",       region: "Tarapacá",    lat: -20.213979, lon: -70.152565, type: "Centro Distribución" },
+      { name: "CD San Bernardo",  city: "San Bernardo",  region: "RM",          lat: -33.592000, lon: -70.705000, type: "Centro Distribución" },
+      { name: "CD Punta Arenas",  city: "Punta Arenas",  region: "Magallanes",  lat: -53.131306, lon: -70.876291, type: "Centro Distribución" },
+      { name: "CD Talca",         city: "Talca",         region: "Maule",       lat: -35.426410, lon: -71.639698, type: "Centro Distribución" },
+      { name: "CD Tambores",      city: "La Unión",      region: "Los Ríos",    lat: -40.292054, lon: -73.077672, type: "Centro Distribución" },
+      { name: "CD Temuco",        city: "Temuco",        region: "Araucanía",   lat: -38.735900, lon: -72.590400, type: "Centro Distribución" },
+    ];
+
+    // === Mapa ===
+    const map = L.map('map', { scrollWheelZoom: false }).setView([-35.5, -71.0], 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    const markersLayer = L.layerGroup().addTo(map);
+
+    function centerCard(c) {
+      const el = document.createElement('div');
+      el.className = 'center';
+      el.innerHTML = `
+        <div class="name">${escapeHtml(c.name)}</div>
+        <div class="meta">${escapeHtml(c.city)} · ${escapeHtml(c.region)} · ${escapeHtml(c.type)}</div>
+      `;
+      el.addEventListener('click', () => {
+        map.setView([c.lat, c.lon], 11, { animate: true });
+        if (c._marker) c._marker.openPopup();
+      });
+      return el;
+    }
+
+    function render(filterText = "") {
+      markersLayer.clearLayers();
+      const list = document.getElementById('list');
+      list.innerHTML = "";
+
+      const q = filterText.trim().toLowerCase();
+      const filtered = centers.filter(c => {
+        const hay = `${c.name} ${c.city} ${c.region} ${c.type}`.toLowerCase();
+        return hay.includes(q);
+      });
+
+      document.getElementById('count').textContent = filtered.length;
+
+      filtered.forEach(c => {
+        const popup = `
+          <div style="font-weight:950;margin-bottom:4px">${escapeHtml(c.name)}</div>
+          <div style="font-size:12px;color:#0f234a">${escapeHtml(c.city)} · ${escapeHtml(c.region)}</div>
+          <div style="font-size:12px;color:#0f234a;margin-top:2px">${escapeHtml(c.type)}</div>
+        `;
+
+        const marker = L.marker([c.lat, c.lon]).bindPopup(popup);
+        marker.addTo(markersLayer);
+        c._marker = marker;
+
+        list.appendChild(centerCard(c));
+      });
+
+      if (filtered.length > 1) {
+        const bounds = L.latLngBounds(filtered.map(c => [c.lat, c.lon]));
+        map.fitBounds(bounds, { padding: [30, 30] });
+      } else if (filtered.length === 1) {
+        map.setView([filtered[0].lat, filtered[0].lon], 11);
+        filtered[0]._marker.openPopup();
+      }
+    }
+
+    document.getElementById('q').addEventListener('input', (e) => render(e.target.value));
+
+    function escapeHtml(str){
+      return String(str).replace(/[&<>"']/g, s => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+      }[s]));
+    }
+
+    function openMailDraft(){
+      const nombre = document.getElementById('nombre')?.value || "";
+      const empresa = document.getElementById('empresa')?.value || "";
+      const email = document.getElementById('email')?.value || "";
+      const telefono = document.getElementById('telefono')?.value || "";
+      const motivo = document.getElementById('motivo')?.value || "";
+      const mensaje = document.getElementById('mensaje')?.value || "";
+
+      const to = [
+        "christian.soto@colun.cl",
+        "luismartinezm@colun.cl",
+        "Bastian.toro@colun.cl",
+        "Veronica.alvarez@colun.cl",
+        "robert.cardenas@colun.cl",
+        "Hsalamanca@colun.cl",
+        "alexander.amigo@externoscolun.cl"
+      ].join(",");
+
+      const subject = encodeURIComponent(`Formulario Transporte Nacional COLUN - ${motivo}`);
+      const body = encodeURIComponent(
+        `Hola equipo Transporte Nacional,\n\n`+
+        `Se recibió un contacto desde la página:\n\n`+
+        `Nombre: ${nombre}\n`+
+        `Empresa/Transportista: ${empresa}\n`+
+        `Correo: ${email}\n`+
+        `Teléfono: ${telefono}\n`+
+        `Motivo: ${motivo}\n\n`+
+        `Mensaje:\n${mensaje}\n\n`+
+        `Saludos.`
+      );
+
+      window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+    }
+
+    // Envío sin recargar (Formspree)
+    const form = document.getElementById("contactForm");
+    const statusBox = document.getElementById("formStatus");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      statusBox.className = "status";
+      statusBox.style.display = "none";
+
+      const formData = new FormData(form);
+
+      try{
+        const res = await fetch(form.action, {
+          method: "POST",
+          body: formData,
+          headers: { "Accept": "application/json" }
+        });
+
+        if(res.ok){
+          form.reset();
+          statusBox.textContent = "✅ Mensaje enviado. Gracias, nos pondremos en contacto a la brevedad.";
+          statusBox.className = "status ok";
+          statusBox.style.display = "block";
+        }else{
+          const data = await res.json().catch(() => ({}));
+          const msg = data?.errors?.[0]?.message || "No se pudo enviar. Intenta nuevamente o usa 'Enviar por correo (backup)'.";
+          statusBox.textContent = "⚠️ " + msg;
+          statusBox.className = "status err";
+          statusBox.style.display = "block";
+        }
+      }catch(err){
+        statusBox.textContent = "⚠️ Error de conexión. Intenta nuevamente o usa 'Enviar por correo (backup)'.";
+        statusBox.className = "status err";
+        statusBox.style.display = "block";
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
