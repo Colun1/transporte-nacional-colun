@@ -24,11 +24,13 @@
       --shadow: 0 18px 50px rgba(15,35,74,.12);
       --radius: 18px;
       --danger:#d81f2a;  /* rojo logo */
-      --ok:#0a7b4f;
-      --warn:#b45a00;
+      --softGreen: rgba(26,163,111,.10);
+      --softBlue: rgba(27,95,214,.10);
     }
 
     *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
@@ -39,13 +41,15 @@
       color:var(--text);
       line-height:1.45;
     }
+
     a{color:inherit}
     .container{max-width:1120px;margin:0 auto;padding:0 18px}
 
+    /* Header */
     header{
       position:sticky; top:0; z-index:50;
       backdrop-filter: blur(10px);
-      background: rgba(244,247,255,.78);
+      background: rgba(244,247,255,.80);
       border-bottom: 1px solid var(--border);
     }
     .nav{
@@ -59,11 +63,11 @@
       letter-spacing:.2px;
       min-width: 260px;
     }
-    .brand .title{
-      display:flex; flex-direction:column; line-height:1.05;
-    }
+    .brand .title{display:flex; flex-direction:column; line-height:1.05;}
     .brand .title strong{font-size:14px}
     .brand .title span{font-size:12px;color:var(--muted);font-weight:800}
+
+    /* Asegúrate que el archivo en GitHub se llame EXACTO: colun-logo.png */
     .logo-img{
       width:70px; height:auto;
       display:block;
@@ -82,9 +86,10 @@
     .navlinks a:hover{
       color:var(--text);
       border-color: var(--border);
-      background: rgba(255,255,255,.65);
+      background: rgba(255,255,255,.75);
     }
 
+    /* Hero */
     .hero{padding:30px 0 18px}
     .hero-grid{
       display:grid; grid-template-columns: 1.2fr .8fr; gap:18px;
@@ -101,6 +106,17 @@
       border:1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
+    }
+    .card.soft{
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.92));
+    }
+
+    /* Hover “toque verde” */
+    .card:hover{
+      border-color: rgba(26,163,111,.28);
+      box-shadow: 0 22px 60px rgba(15,35,74,.14);
+      transform: translateY(-1px);
+      transition: 180ms ease;
     }
 
     .hero-main{
@@ -133,11 +149,12 @@
       font-size:12px; color:var(--muted);
       border:1px solid var(--border);
       padding:6px 10px; border-radius:999px;
-      background: rgba(255,255,255,.70);
+      background: rgba(255,255,255,.75);
       flex-wrap:wrap;
     }
     .dot{width:8px;height:8px;border-radius:99px;background:var(--brand)}
     .dot.red{background:var(--danger)}
+
     h1{margin:14px 0 10px; font-size:38px; line-height:1.05}
     @media (max-width: 900px){h1{font-size:34px}}
     .sub{color:var(--muted); font-size:15px; max-width:78ch}
@@ -149,18 +166,22 @@
       border-radius:14px;
       border:1px solid var(--border);
       text-decoration:none;
-      font-weight:800;
+      font-weight:850;
       font-size:14px;
-      background: rgba(255,255,255,.78);
+      background: rgba(255,255,255,.85);
       cursor:pointer;
     }
     .btn.primary{
       border-color: rgba(26,163,111,.35);
-      background: linear-gradient(135deg, rgba(26,163,111,.16), rgba(27,95,214,.10));
+      background: linear-gradient(135deg, rgba(26,163,111,.18), rgba(27,95,214,.08));
+    }
+    .btn.green{
+      border-color: rgba(26,163,111,.40);
+      background: linear-gradient(135deg, rgba(26,163,111,.22), rgba(255,255,255,.70));
     }
     .btn.red{
       border-color: rgba(216,31,42,.25);
-      background: linear-gradient(135deg, rgba(216,31,42,.10), rgba(255,255,255,.70));
+      background: linear-gradient(135deg, rgba(216,31,42,.10), rgba(255,255,255,.75));
     }
     .btn:hover{filter:brightness(1.03)}
 
@@ -170,21 +191,31 @@
       padding:14px;
       border-radius:16px;
       border:1px solid var(--border);
-      background: rgba(244,247,255,.78);
+      background: rgba(244,247,255,.80);
     }
     .kpi .n{font-size:14px;font-weight:950}
     .kpi .l{color:var(--muted);font-size:12px;margin-top:4px}
 
+    /* Sections */
     section{padding:22px 0}
     .section-title{
       font-size:18px; margin:0 0 12px;
       display:flex; align-items:center; gap:10px;
     }
+    .section-title::after{
+      content:"";
+      height:2px;
+      flex:1;
+      border-radius:999px;
+      background: linear-gradient(90deg, rgba(26,163,111,.40), rgba(27,95,214,.18), transparent);
+      margin-left:6px;
+    }
+
     .pill{
       font-size:12px; color:var(--muted);
       border:1px solid var(--border);
       padding:4px 10px; border-radius:999px;
-      background: rgba(255,255,255,.78);
+      background: rgba(255,255,255,.80);
     }
     .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
     @media (max-width: 900px){.grid-3{grid-template-columns:1fr}}
@@ -199,7 +230,19 @@
       font-size:14px;
     }
     .bullets li{margin:6px 0}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(26,163,111,.25);
+      background: rgba(26,163,111,.08);
+      color: #0a5b3a;
+      font-weight:900;
+      font-size:12px;
+      margin-top:10px;
+    }
 
+    /* Map */
     .map-wrap{padding:16px}
     #map{
       width:100%;
@@ -214,7 +257,7 @@
     }
     .search{flex:1; min-width:220px; display:flex; gap:10px; align-items:center;}
 
-    input[type="search"], input[type="text"], input[type="email"], textarea, select{
+    input[type="search"]{
       width:100%;
       padding:10px 12px;
       border-radius:14px;
@@ -224,8 +267,7 @@
       outline:none;
       font: inherit;
     }
-    textarea{min-height:110px; resize: vertical;}
-    input::placeholder, textarea::placeholder{color: rgba(75,91,122,.75)}
+    input::placeholder{color: rgba(75,91,122,.75)}
 
     .list{
       margin-top:12px;
@@ -238,13 +280,17 @@
       padding:12px;
       border-radius:16px;
       border:1px solid var(--border);
-      background: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.94);
       cursor:pointer;
     }
-    .center:hover{background: rgba(244,247,255,.97)}
+    .center:hover{
+      background: rgba(244,247,255,.98);
+      border-color: rgba(26,163,111,.28);
+    }
     .center .name{font-weight:950}
     .center .meta{color:var(--muted); font-size:13px; margin-top:4px}
 
+    /* Contact */
     .contact-grid{
       display:grid;
       grid-template-columns: 1.1fr .9fr;
@@ -262,18 +308,22 @@
       padding:12px;
       border-radius:16px;
       border:1px solid var(--border);
-      background: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.94);
       display:flex;
       justify-content:space-between;
       gap:12px;
       align-items:center;
       flex-wrap:wrap;
     }
+    .contact-card:hover{
+      border-color: rgba(26,163,111,.28);
+      background: rgba(244,247,255,.98);
+    }
     .contact-card .who{display:flex; flex-direction:column; gap:2px;}
     .contact-card .who strong{font-weight:950}
     .contact-card .who span{color:var(--muted); font-size:12px}
     .contact-card a{
-      font-weight:850;
+      font-weight:900;
       text-decoration:none;
       border:1px solid var(--border);
       padding:8px 10px;
@@ -282,33 +332,27 @@
     }
     .contact-card a:hover{filter:brightness(1.02)}
 
-    .form-row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-    @media (max-width: 900px){.form-row{grid-template-columns:1fr}}
+    .hint{color:var(--muted); font-size:12px; margin-top:10px}
 
-    .hint{color:var(--muted); font-size:12px; margin-top:8px}
-    .status{
-      margin-top:12px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background: rgba(244,247,255,.85);
-      display:none;
-      font-weight:800;
-      font-size:13px;
+    /* Google Form embed */
+    .gform-wrap{
+      border:1px solid rgba(26,163,111,.22);
+      border-radius:16px;
+      overflow:hidden;
+      background:#fff;
+      box-shadow: 0 10px 26px rgba(15,35,74,.08);
     }
-    .status.ok{
+    .gform{
+      width:100%;
+      height: 780px; /* ajustable */
+      border:0;
       display:block;
-      border-color: rgba(10,123,79,.25);
-      background: rgba(10,123,79,.08);
-      color: var(--ok);
     }
-    .status.err{
-      display:block;
-      border-color: rgba(216,31,42,.25);
-      background: rgba(216,31,42,.08);
-      color: var(--danger);
+    @media (max-width: 900px){
+      .gform{ height: 920px; }
     }
 
+    /* Footer */
     footer{
       padding:26px 0 40px;
       color: var(--muted);
@@ -320,14 +364,23 @@
     .small{font-size:13px}
     .tag{
       display:inline-flex; gap:8px; align-items:center;
-      border:1px solid var(--border);
+      border:1px solid rgba(26,163,111,.22);
       padding:7px 10px; border-radius:999px;
-      background: rgba(255,255,255,.78);
+      background: rgba(26,163,111,.08);
       margin-top:10px;
+      color:#0a5b3a;
+      font-weight:900;
+      font-size:12px;
     }
 
     .leaflet-popup-content{
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    /* Reduce motion */
+    @media (prefers-reduced-motion: reduce){
+      .card:hover{transform:none}
+      html{scroll-behavior:auto}
     }
   </style>
 </head>
@@ -359,7 +412,7 @@
   <main class="container">
     <div class="hero">
       <div class="hero-grid">
-        <div class="card hero-main">
+        <div class="card hero-main soft">
           <div class="eyebrow">
             <span class="dot"></span> Coordinación · Control · Seguimiento
             <span style="width:1px;height:14px;background:var(--border);display:inline-block;margin:0 6px"></span>
@@ -374,16 +427,21 @@
 
           <div class="cta">
             <a class="btn primary" href="#centros">Ver centros de destino</a>
-            <a class="btn" href="#cargas">Ver tipos de carga</a>
-            <a class="btn red" href="#contacto">Contactar</a>
+            <a class="btn green" href="#contacto">Formulario / Contacto</a>
+            <a class="btn red" target="_blank" rel="noopener"
+               href="https://wa.me/56941346703?text=Hola%20Alexander,%20te%20escribo%20por%20Transporte%20Nacional%20COLUN.%20%C2%BFPodemos%20coordinar%3F">
+              WhatsApp
+            </a>
           </div>
 
-          <p class="sub" style="margin-top:14px;font-size:13px">
+          <div class="badge">Foco actual: Doble piso con Kinedyne</div>
+
+          <p class="sub" style="margin-top:12px;font-size:13px">
             *Página informativa para transportistas y aliados. Contenidos pueden ajustarse según lineamientos internos.
           </p>
         </div>
 
-        <div class="card hero-side">
+        <div class="card hero-side soft">
           <div class="kpis">
             <div class="kpi">
               <div class="n">Cobertura nacional</div>
@@ -403,11 +461,11 @@
             </div>
           </div>
 
-          <div style="margin-top:14px; padding:14px; border-radius:16px; border:1px solid var(--border); background:rgba(255,255,255,.88)">
-            <div style="font-weight:950">¿Para qué sirve esta página?</div>
+          <div style="margin-top:14px; padding:14px; border-radius:16px; border:1px solid rgba(26,163,111,.20); background:rgba(26,163,111,.06)">
+            <div style="font-weight:950;color:#0a5b3a">¿Para qué sirve esta página?</div>
             <div style="color:var(--muted); font-size:13px; margin-top:6px">
-              Para que cualquier transportista tenga una visión rápida de nuestro rol,
-              el alcance nacional y los tipos de carga/equipos con los que trabajamos.
+              Para que cualquier transportista tenga una visión rápida de nuestro rol, el alcance nacional
+              y los tipos de carga/equipos con los que trabajamos.
             </div>
           </div>
         </div>
@@ -417,15 +475,15 @@
     <section id="que-hacemos">
       <h2 class="section-title">Qué hacemos <span class="pill">Resumen operativo</span></h2>
       <div class="grid-3">
-        <div class="card item">
+        <div class="card item soft">
           <h3>Planificación y coordinación</h3>
           <p>Programación de despachos, ventanas, prioridades y coordinación con centros de destino.</p>
         </div>
-        <div class="card item">
+        <div class="card item soft">
           <h3>Control y seguimiento</h3>
           <p>Monitoreo de viajes, comunicación ante contingencias y soporte operativo.</p>
         </div>
-        <div class="card item">
+        <div class="card item soft">
           <h3>Mejora continua</h3>
           <p>Levantamos oportunidades con centros y transportistas para mejorar tiempos y servicio.</p>
         </div>
@@ -436,7 +494,7 @@
       <h2 class="section-title">Tipos de carga y equipos <span class="pill">Cómo operamos</span></h2>
 
       <div class="grid-3">
-        <div class="card item">
+        <div class="card item soft">
           <h3>Cargas</h3>
           <p>Trabajamos con diferentes necesidades operacionales según el producto.</p>
           <ul class="bullets">
@@ -445,7 +503,7 @@
           </ul>
         </div>
 
-        <div class="card item">
+        <div class="card item soft">
           <h3>Tipos de camión</h3>
           <p>Equipos utilizados según destino y requerimientos.</p>
           <ul class="bullets">
@@ -455,7 +513,7 @@
           </ul>
         </div>
 
-        <div class="card item">
+        <div class="card item soft">
           <h3>Modalidad de carga</h3>
           <p>Según tipo de carga, destino y capacidad.</p>
           <ul class="bullets">
@@ -466,7 +524,7 @@
       </div>
 
       <div class="grid-3" style="margin-top:14px">
-        <div class="card item" style="grid-column: span 2">
+        <div class="card item soft" style="grid-column: span 2">
           <h3>Estándares y métodos (histórico y evolución)</h3>
           <p>
             Actualmente damos foco a la modalidad <strong>Kinedyne</strong> para doble piso. Históricamente también
@@ -474,7 +532,7 @@
             según disponibilidad y necesidad operacional.
           </p>
         </div>
-        <div class="card item">
+        <div class="card item soft">
           <h3>Objetivo</h3>
           <p>
             Mantener una operación <strong>segura</strong>, <strong>eficiente</strong> y <strong>estandarizada</strong>,
@@ -487,14 +545,14 @@
     <section id="mision">
       <h2 class="section-title">Misión y visión <span class="pill">Identidad del equipo</span></h2>
       <div class="grid-3">
-        <div class="card item" style="grid-column: span 2">
+        <div class="card item soft" style="grid-column: span 2">
           <h3>Misión</h3>
           <p>
             Asegurar una operación de transporte nacional confiable, segura y eficiente, coordinando
             actores internos y externos para cumplir los compromisos de servicio.
           </p>
         </div>
-        <div class="card item">
+        <div class="card item soft">
           <h3>Visión</h3>
           <p>
             Ser un referente en gestión de transporte, con altos estándares de control, mejora continua
@@ -507,7 +565,7 @@
     <section id="centros">
       <h2 class="section-title">Centros de destino <span class="pill">Mapa + listado</span></h2>
 
-      <div class="card map-wrap">
+      <div class="card map-wrap soft">
         <div id="map" aria-label="Mapa de centros en Chile"></div>
 
         <div class="map-tools">
@@ -530,15 +588,15 @@
     <section id="proceso">
       <h2 class="section-title">Cómo trabajamos <span class="pill">Flujo simple</span></h2>
       <div class="grid-3">
-        <div class="card item">
+        <div class="card item soft">
           <h3>1) Programación</h3>
           <p>Definimos ventanas, requisitos, prioridades y coordinación por destino.</p>
         </div>
-        <div class="card item">
+        <div class="card item soft">
           <h3>2) Ejecución y seguimiento</h3>
           <p>Control del avance, comunicación por desvíos/demoras y apoyo operativo.</p>
         </div>
-        <div class="card item">
+        <div class="card item soft">
           <h3>3) Cierre y mejora</h3>
           <p>Revisión de incidentes, feedback y acciones para mejorar experiencia y servicio.</p>
         </div>
@@ -546,75 +604,46 @@
     </section>
 
     <section id="contacto">
-      <h2 class="section-title">Contacto <span class="pill">Correos + formulario</span></h2>
+      <h2 class="section-title">Contacto <span class="pill">Formulario + correos</span></h2>
 
       <div class="contact-grid">
-        <!-- FORMULARIO -->
-        <div class="card item">
+        <!-- GOOGLE FORM EMBED -->
+        <div class="card item soft">
           <h3>Formulario</h3>
           <p style="color:var(--muted); font-size:14px; margin-top:0">
-            Completa el formulario y te contactaremos. (Enviado vía Formspree)
+            Completa el formulario y te contactaremos.
           </p>
 
-          <form id="contactForm" method="POST" action="https://formspree.io/f/xnjbogbk">
-            <div class="form-row">
-              <div>
-                <label for="nombre" style="font-weight:850;font-size:13px">Nombre</label>
-                <input id="nombre" name="nombre" type="text" placeholder="Ej: Juan Pérez" required />
-              </div>
-              <div>
-                <label for="empresa" style="font-weight:850;font-size:13px">Empresa / Transportista</label>
-                <input id="empresa" name="empresa" type="text" placeholder="Ej: Transportes X" />
-              </div>
-            </div>
+          <div class="gform-wrap">
+            <iframe
+              class="gform"
+              src="https://docs.google.com/forms/d/e/1FAIpQLSfXciwLkbD2nREum5VXHE5IkFdytg_lk1gGunW8m2U2k1R5Sg/viewform?embedded=true"
+              frameborder="0"
+              marginheight="0"
+              marginwidth="0"
+              loading="lazy"
+              title="Formulario Transporte Nacional COLUN"
+            >Cargando…</iframe>
+          </div>
 
-            <div class="form-row" style="margin-top:10px">
-              <div>
-                <label for="email" style="font-weight:850;font-size:13px">Correo</label>
-                <input id="email" name="email" type="email" placeholder="correo@ejemplo.cl" required />
-              </div>
-              <div>
-                <label for="telefono" style="font-weight:850;font-size:13px">Teléfono</label>
-                <input id="telefono" name="telefono" type="text" placeholder="+56 9 xxxx xxxx" />
-              </div>
-            </div>
+          <div class="cta" style="margin-top:12px">
+            <a class="btn green" target="_blank" rel="noopener"
+               href="https://docs.google.com/forms/d/e/1FAIpQLSfXciwLkbD2nREum5VXHE5IkFdytg_lk1gGunW8m2U2k1R5Sg/viewform?usp=sf_link">
+              Abrir formulario en nueva pestaña
+            </a>
+            <a class="btn red" target="_blank" rel="noopener"
+               href="https://wa.me/56941346703?text=Hola%20Alexander,%20te%20escribo%20por%20Transporte%20Nacional%20COLUN.%20%C2%BFPodemos%20coordinar%3F">
+              WhatsApp
+            </a>
+          </div>
 
-            <div style="margin-top:10px">
-              <label for="motivo" style="font-weight:850;font-size:13px">Motivo</label>
-              <select id="motivo" name="motivo">
-                <option value="Coordinación / Consultas">Coordinación / Consultas</option>
-                <option value="Disponibilidad de equipos">Disponibilidad de equipos</option>
-                <option value="Incidencia / Seguimiento">Incidencia / Seguimiento</option>
-                <option value="Otros">Otros</option>
-              </select>
-            </div>
-
-            <div style="margin-top:10px">
-              <label for="mensaje" style="font-weight:850;font-size:13px">Mensaje</label>
-              <textarea id="mensaje" name="mensaje" placeholder="Escribe aquí tu consulta..." required></textarea>
-            </div>
-
-            <input type="hidden" name="destinatarios" value="christian.soto@colun.cl; luismartinezm@colun.cl; bastian.toro@colun.cl; veronica.alvarez@colun.cl; robert.cardenas@colun.cl; hsalamanca@colun.cl; alexander.amigo@externoscolun.cl" />
-
-            <div class="cta" style="margin-top:12px">
-              <button class="btn primary" type="submit">Enviar formulario</button>
-              <button class="btn" type="button" onclick="openMailDraft()">Enviar por correo (backup)</button>
-              <a class="btn red" target="_blank" rel="noopener"
-                 href="https://wa.me/56941346703?text=Hola%20Alexander,%20te%20escribo%20por%20Transporte%20Nacional%20COLUN.%20%C2%BFPodemos%20coordinar%3F">
-                WhatsApp
-              </a>
-            </div>
-
-            <div id="formStatus" class="status"></div>
-
-            <div class="hint">
-              Si Formspree te pide verificación, revisa tu correo y confirma el formulario.
-            </div>
-          </form>
+          <div class="hint">
+            Si el formulario no carga en algunos navegadores corporativos, usa el botón “Abrir formulario”.
+          </div>
         </div>
 
         <!-- CONTACTOS -->
-        <div class="card item">
+        <div class="card item soft">
           <h3>Correos de contacto</h3>
           <p style="color:var(--muted); font-size:14px; margin-top:0">
             Puedes escribir directamente a cualquiera de estos contactos.
@@ -622,7 +651,7 @@
 
           <div class="contact-list">
             <div class="contact-card">
-              <div class="who"><strong>Christian Soto</strong><span>Jefe</span></div>
+              <div class="who"><strong>Christian Soto</strong><span>Jefe Transporte Nacional</span></div>
               <a href="mailto:christian.soto@colun.cl?subject=Contacto%20Transporte%20Nacional%20COLUN">Escribir</a>
             </div>
 
@@ -658,8 +687,16 @@
           </div>
 
           <div class="cta" style="margin-top:12px">
-            <a class="btn" href="mailto:alexander.amigo@externoscolun.cl?subject=Contacto%20Transporte%20Nacional%20COLUN&body=Hola%20Alexander,%0D%0A%0D%0AMe%20gustar%C3%ADa%20coordinar%20lo%20siguiente:%0D%0A-%20%0D%0A%0D%0AGracias.">Escribir a Alexander</a>
-            <a class="btn red" href="#centros">Volver al mapa</a>
+            <a class="btn primary"
+               href="mailto:alexander.amigo@externoscolun.cl?subject=Contacto%20Transporte%20Nacional%20COLUN&body=Hola%20Alexander,%0D%0A%0D%0AMe%20gustar%C3%ADa%20coordinar%20lo%20siguiente:%0D%0A-%20%0D%0A%0D%0AGracias.">
+              Escribir a Alexander
+            </a>
+            <a class="btn" href="#centros">Volver al mapa</a>
+          </div>
+
+          <div class="hint">
+            Recomendación interna: si crean un alias tipo <strong>transportenacional@colun.cl</strong>,
+            pueden centralizar todo en un solo correo.
           </div>
         </div>
       </div>
@@ -684,7 +721,7 @@
   </main>
 
   <script>
-    // Centros (según Excel)
+    // Centros (según tu Excel)
     const centers = [
       { name: "CD Antofagasta",   city: "Antofagasta",   region: "Antofagasta", lat: -23.512620, lon: -70.399890, type: "Centro Distribución" },
       { name: "CD Belloto",       city: "Quilpué",       region: "Valparaíso",  lat: -33.040030, lon: -71.417590, type: "Centro Distribución" },
@@ -766,77 +803,6 @@
         '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
       }[s]));
     }
-
-    function openMailDraft(){
-      const nombre = document.getElementById('nombre')?.value || "";
-      const empresa = document.getElementById('empresa')?.value || "";
-      const email = document.getElementById('email')?.value || "";
-      const telefono = document.getElementById('telefono')?.value || "";
-      const motivo = document.getElementById('motivo')?.value || "";
-      const mensaje = document.getElementById('mensaje')?.value || "";
-
-      const to = [
-        "christian.soto@colun.cl",
-        "luismartinezm@colun.cl",
-        "Bastian.toro@colun.cl",
-        "Veronica.alvarez@colun.cl",
-        "robert.cardenas@colun.cl",
-        "Hsalamanca@colun.cl",
-        "alexander.amigo@externoscolun.cl"
-      ].join(",");
-
-      const subject = encodeURIComponent(`Formulario Transporte Nacional COLUN - ${motivo}`);
-      const body = encodeURIComponent(
-        `Hola equipo Transporte Nacional,\n\n`+
-        `Se recibió un contacto desde la página:\n\n`+
-        `Nombre: ${nombre}\n`+
-        `Empresa/Transportista: ${empresa}\n`+
-        `Correo: ${email}\n`+
-        `Teléfono: ${telefono}\n`+
-        `Motivo: ${motivo}\n\n`+
-        `Mensaje:\n${mensaje}\n\n`+
-        `Saludos.`
-      );
-
-      window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
-    }
-
-    // Envío sin recargar (Formspree)
-    const form = document.getElementById("contactForm");
-    const statusBox = document.getElementById("formStatus");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      statusBox.className = "status";
-      statusBox.style.display = "none";
-
-      const formData = new FormData(form);
-
-      try{
-        const res = await fetch(form.action, {
-          method: "POST",
-          body: formData,
-          headers: { "Accept": "application/json" }
-        });
-
-        if(res.ok){
-          form.reset();
-          statusBox.textContent = "✅ Mensaje enviado. Gracias, nos pondremos en contacto a la brevedad.";
-          statusBox.className = "status ok";
-          statusBox.style.display = "block";
-        }else{
-          const data = await res.json().catch(() => ({}));
-          const msg = data?.errors?.[0]?.message || "No se pudo enviar. Intenta nuevamente o usa 'Enviar por correo (backup)'.";
-          statusBox.textContent = "⚠️ " + msg;
-          statusBox.className = "status err";
-          statusBox.style.display = "block";
-        }
-      }catch(err){
-        statusBox.textContent = "⚠️ Error de conexión. Intenta nuevamente o usa 'Enviar por correo (backup)'.";
-        statusBox.className = "status err";
-        statusBox.style.display = "block";
-      }
-    });
 
     render();
   </script>
